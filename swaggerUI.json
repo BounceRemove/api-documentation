@@ -1,0 +1,382 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://dev.bounceremove.com",
+      "description": "BounceRemove Developers API"
+    }
+  ],
+  "info": {
+    "description": "API stands for Application Programming Interface. You can connect our system with your website, landing page, application or software to verify emails in real time or to send us files programmatically.\n\nUsing BounceRemove's API you can avoid bad emails added to your email lists. You may also use our API to resell our services. \n\n# Authentication\nUse your API key to identify your account when making an API call. Each endpoint contains an example of how to use our API. \nSimply just replace \"your-api-key\" with your API key you can find on this page: [https://client.bounceremove.com/dashboard/developers](https://client.bounceremove.com/dashboard/developers)\n\n**Test API key for development: `TEST_bounceremoveapi`. This API key will return random results.**\n        \n",
+    "version": "3.2.0",
+    "title": "BounceRemove Developers API"
+  },
+  "tags": [
+    {
+      "name": "Single Validation",
+      "description": "Verify an email address in real time as your subscriber signs up to your newsletter. For cleaning larger databases please use our Bulk Validation.\nSpecial characters in the email address should be encoded.\n"
+    },
+    {
+      "name": "Bulk Validation",
+      "description": "Send your emails in a `TXT/CSV/XLSX` file programmatically and retrieve your results."
+    }
+  ],
+  "paths": {
+    "/validation/single": {
+      "get": {
+        "tags": [
+          "Single Validation"
+        ],
+        "summary": "Verify an email address in real time",
+        "description": "Verify an email address in real time and get resutls in just a second.",
+        "operationId": "single-verification",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "query",
+            "description": "Your API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "LIVE_12345678900"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Email address that needs to be verified",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "test@example.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SingleCheckResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validation/bulk": {
+      "post": {
+        "tags": [
+          "Bulk Validation"
+        ],
+        "summary": "File upload",
+        "description": "Upload file containing email addresses for verification",
+        "operationId": "bulk-upload",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "query",
+            "description": "Your API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "LIVE_12345678900"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request parameters for upload",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "upload": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Succesful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BulkCheckResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/info": {
+      "get": {
+        "tags": [
+          "Bulk Validation"
+        ],
+        "summary": "File info",
+        "description": "Get info of the uploaded file",
+        "operationId": "bulk-fileinfo",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "query",
+            "description": "Your API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "LIVE_12345678900"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The ID of the uploaded file",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 123456
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/download": {
+      "get": {
+        "tags": [
+          "Bulk Validation"
+        ],
+        "summary": "Download report",
+        "description": "Download report of the verification result",
+        "operationId": "bulk-download",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "query",
+            "description": "Your API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "LIVE_12345678900"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The ID of the uploaded file",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 940
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful request",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/delete": {
+      "get": {
+        "tags": [
+          "Bulk Validation"
+        ],
+        "summary": "Delete a file",
+        "description": "This will delete a file uploaded to the Bulk Validation",
+        "operationId": "bulk-delete",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "description": "Your API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "your-api-key"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The ID of the uploaded file",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 115
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful request"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SingleCheckResponse": {
+        "description": "Single Email Validation Response Example.",
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "description": "The amount of credits left on your account.",
+            "example": 57480
+          },
+          "email": {
+            "type": "string",
+            "description": "The verified email address.",
+            "example": "bademail@gmal.com"
+          },
+          "domain": {
+            "type": "string",
+            "description": "The domain of the verifed email address.",
+            "example": "test.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "Email validation result.",
+            "example": "High-bounce",
+            "enum": [
+              "Deliverable",
+              "Undeliverable",
+              "High-bounce",
+              "Disposable",
+              "Risky"
+            ]
+          },
+          "is_free": {
+            "description": "Lets you know whether the email address is free or paid email address.",
+            "enum": [
+              true,
+              false
+            ],
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "BulkCheckResponse": {
+        "description": "Bulk Email Validation Response Example.",
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "description": "The amount of credits left on your account.",
+            "example": 57480
+          },
+          "file_id": {
+            "type": "string",
+            "description": "The ID of the uploaded file.",
+            "example": "123456"
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The name of the uploaded file.",
+            "example": "emails1.txt"
+          },
+          "total_emails": {
+            "type": "integer",
+            "description": "Number of unique emails found on the file.",
+            "example": 365040
+          },
+          "uploadedAT": {
+            "type": "string",
+            "description": "Date and Time of the uploaded file.",
+            "example": "2022-09-24T11:43:12.000Z"
+          }
+        }
+      },
+      "FileInfoResponse": {
+        "description": "File Info Report Response Example.",
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "The ID of the uploaded file.",
+            "example": "finished"
+          },
+          "total_emails": {
+            "type": "integer",
+            "description": "Number of unique emails found on the file.",
+            "example": 365040
+          },
+          "uploadedAT": {
+            "type": "string",
+            "description": "Date and Time of the uploaded file.",
+            "example": "2022-09-24 11:43:12"
+          },
+          "stats": {
+            "type": "object",
+            "properties": {
+              "deliverable": {
+                "type": "integer",
+                "example": 83
+              },
+              "undeliverable": {
+                "type": "integer",
+                "example": 4
+              },
+              "high_bounce": {
+                "type": "integer",
+                "example": 40
+              },
+              "disposable": {
+                "type": "integer",
+                "example": 5
+              },
+              "risky": {
+                "type": "integer",
+                "example": 0
+              }
+            },
+            "example": "{ \"deliverable\": 0, \"undeliverable\": 1, \"high_bounce\": 0, \"disposable\": 0, \"risky\": 0 }"
+          }
+        }
+      },
+      "Errors": {
+        "description": "\n**The below table defines the Error codes that this API may return**\n\n| ERROR Code      |  | Reason                             |\n| ---------------- | ------------| -----------------------------------|\n| missing_api_key              |      | No KEY was specified on the API call.   |\n| invalid_api_key              |      | Malformed/Invalid API key.   |\n| insufficient_credits              |      | You dont have enough credits to make validation request, go to your account dashboard to topup your account.   |\n| file_larger_than_credits              |      | Selected file has more emails than your available credits.   |\n| no_file_selected              |      | No file was selected to be uploaded.   |\n| invalid_file_extension              |      | Invalid file extension please make sure your file is a valid txt/csv/xlsx file.   |\n| empty_file              |      | Your file doesnt contain any emails.   |\n| missing_file_id              |      | No File ID was specified on the API call.   |\n"
+      }
+    }
+  }
+}
